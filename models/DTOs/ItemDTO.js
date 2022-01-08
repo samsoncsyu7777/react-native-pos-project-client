@@ -15,8 +15,8 @@ class ItemDTO {
       this.tax2 = 0.00,
       this.dateTimeCreated = 0,
       this.dateTimeModified = 0,
-      this.enabl = true,
-      this.clientId = 0;
+      this.enable = true,
+      this.client = "";
     }    
   }
   

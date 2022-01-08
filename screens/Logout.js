@@ -1,19 +1,16 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import {
   StyleSheet,
   Text,
   View,
-  Platform
 } from "react-native";
 import theme from "../Theme";
 import Icon from 'react-native-vector-icons/EvilIcons';
-import { withTheme, TextInput } from 'react-native-paper';
-import Login from "./Login";
-import secret from "../Secret";
+import { withTheme } from 'react-native-paper';
 import { UserContext } from "../contexts/UserContext";
 
 function Logout(props) {
-  const { user, setUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const submit = (e) => {
     e.preventDefault();

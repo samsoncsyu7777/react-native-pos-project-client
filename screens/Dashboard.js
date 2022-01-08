@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from "react";
-import { BottomNavigation, Text } from 'react-native-paper';
+import React, { useState } from "react";
+import { BottomNavigation } from 'react-native-paper';
 import Inventory from "./Inventory";
 import ChangePassword from "./ChangePassword";
 import Logout from "./Logout";

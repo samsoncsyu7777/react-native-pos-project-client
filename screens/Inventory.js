@@ -1,75 +1,77 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import {
   StyleSheet,
   Text,
   View,
-  Platform
 } from "react-native";
 import theme from "../Theme";
 import Icon from 'react-native-vector-icons/EvilIcons';
 import { withTheme, TextInput } from 'react-native-paper';
-import Item from "./Item";
-import secret from "../Secret";
+import MyDialog from "../components/Dialog";
 import { UserContext } from "../contexts/UserContext";
+import { getItem } from "../services/APIs/item";
 
 function Inventory(props) {
-  const { user, setUser } = useContext(UserContext);
-  const [upc , setUpc] = useState('');
+  const { user } = useContext(UserContext);
+  const [upc, setUpc] = useState('');
+  const [title, setTitle] = useState('');
+  const [message, setMessage] = useState('');
+  const [visible, setVisible] = useState(false);
 
   const submit = (e) => {
     e.preventDefault();
     searchUpc();
   };
 
-  const searchUpc = () => {
-    const PROXY_URL = (Platform.OS === 'web') ? 'https://cors-anywhere.herokuapp.com/' : '';
-    const URL = secret.URL+'/api/v1/item/get-upc/'+upc;  
+  const hideDialog = () => {
+    setVisible(false);
+  }
 
-    const res = fetch(PROXY_URL+URL, {
-      method: "get",
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + user.token
-      }
-    })
-      .then((response) => response.json())
+  const searchUpc = () => {
+    getItem(user.token, upc)
       .then((responseJson) => {
+        setVisible(true);
         if ("content" in responseJson) {
-          props.props.navigation.navigate('Item', {itemDTO: responseJson.content[0]});
-        } else if ("message" in responseJson) {
-          setMessage(responseJson.message);
-          setSeverity("error");
+          setTitle("Completed");
+          setMessage("Fetch the item successfully");
+          props.props.navigation.navigate('Item', { itemDTO: responseJson.content[0] });
         } else if ("errors" in responseJson) {
-          setMessage(
-            responseJson.errors[0].param + ": " + responseJson.errors[0].msg
-          );
+          setTitle("Error");
+          setMessage(responseJson.errors.message);
         }
       })
       .catch((error) => {
-        console.error(error);
+        setTitle("Error");
+        setMessage("Unable to connect to server. Please try again");
       });
   }
 
-    return (
-      <View style={styles.container}>
-        <Text style={styles.text}>UPC</Text>
-        <TextInput
-          mode="outlined"
-          value={upc}
-          label="UPC"
-          style={styles.textInput} 
-          onChangeText={upc => setUpc(upc)}
-        />
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>UPC</Text>
+      <TextInput
+        mode="outlined"
+        value={upc}
+        label="UPC"
+        style={styles.textInput}
+        onChangeText={upc => setUpc(upc)}
+      />
 
-        <Icon 
-          name="arrow-right" 
-          size={90} 
-          color="#1690aa"
-          onPress={submit}
-        />
-      </View>
-    );
-  
+      <Icon
+        name="arrow-right"
+        size={90}
+        color="#1690aa"
+        onPress={submit}
+      />
+      <MyDialog
+        visible={visible}
+        title={title}
+        message={message}
+        hideDialog={hideDialog}
+      />
+    </View>
+  );
+
 }
 
 export default withTheme(Inventory);

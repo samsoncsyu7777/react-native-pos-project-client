@@ -1,4 +1,3 @@
-import React from "react";
 import { configureFonts, DefaultTheme } from "react-native-paper";
 import customFonts from "./Fonts";
 
@@ -12,6 +11,8 @@ const theme = {
     background: "#ccfeff",
     accent: "#f1c40f",
     dialog: "#f0cde8",
+    loginBackground: "#e0ffee",
+    itemBackground: "#ffeef5",
   },
   headerStyle: {
     headerStyle: {backgroundColor: '#ff9977'},
