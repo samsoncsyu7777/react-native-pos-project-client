@@ -1,8 +1,9 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   StyleSheet,
   Text,
   View,
+  Button,
 } from "react-native";
 import theme from "../Theme";
 import Icon from 'react-native-vector-icons/EvilIcons';
@@ -10,13 +11,17 @@ import { withTheme, TextInput } from 'react-native-paper';
 import MyDialog from "../components/Dialog";
 import { UserContext } from "../contexts/UserContext";
 import { getItem } from "../services/APIs/item";
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 function Inventory(props) {
   const { user } = useContext(UserContext);
   const [upc, setUpc] = useState('');
+  const [codeType, setCodeType] = useState('');
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [visible, setVisible] = useState(false);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
 
   const submit = (e) => {
     e.preventDefault();
@@ -46,6 +51,26 @@ function Inventory(props) {
       });
   }
 
+  useEffect(() => {
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScanned(true);
+    setUpc(data);
+    setCodeType(type);
+  };
+
+  if (hasPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>UPC</Text>
@@ -62,6 +87,13 @@ function Inventory(props) {
         color="#1690aa"
         onPress={submit}
       />
+      {
+        !scanned && <BarCodeScanner
+          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          style={StyleSheet.absoluteFillObject}
+        />
+      }
+      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
       <MyDialog
         visible={visible}
         title={title}
