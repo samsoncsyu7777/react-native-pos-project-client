@@ -56,7 +56,6 @@ function Inventory(props) {
         style={styles.textInput}
         onChangeText={upc => setUpc(upc)}
       />
-
       <Icon
         name="arrow-right"
         size={90}
